@@ -1,55 +1,114 @@
+// root.tsx
+import React, { useContext, useEffect } from 'react'
+import { withEmotionCache } from '@emotion/react'
+import { Box, ChakraProvider, extendTheme } from '@chakra-ui/react'
 import {
-  Form,
   Links,
   LiveReload,
   Meta,
+  Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react";
+} from '@remix-run/react'
+import { MetaFunction, LinksFunction } from '@remix-run/node' // Depends on the runtime you choose
+
+import { ServerStyleContext, ClientStyleContext } from './context'
+import Header from './components/Header'
+import Footer from './components/Footer'
+
+export const meta: MetaFunction = () => {
+  return [
+    {
+      title: "Jess's Portfolio",
+      description: 'Welcome to my portfolio site!',
+    }
+  ];
+}
+
+export const links: LinksFunction = () => {
+  return [
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap'
+    },
+  ]
+}
+
+interface DocumentProps {
+  children: React.ReactNode;
+}
+
+const Document = withEmotionCache(
+  ({ children }: DocumentProps, emotionCache) => {
+    const serverStyleData = useContext(ServerStyleContext);
+    const clientStyleData = useContext(ClientStyleContext);
+
+    // Only executed on client
+    useEffect(() => {
+      // re-link sheet container
+      emotionCache.sheet.container = document.head;
+      // re-inject tags
+      const tags = emotionCache.sheet.tags;
+      emotionCache.sheet.flush();
+      tags.forEach((tag) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (emotionCache.sheet as any)._insertTag(tag);
+      });
+      // reset cache to reapply global styles
+      clientStyleData?.reset();
+    }, []);
+
+    return (
+      <html lang="en">
+        <head>
+          <Meta />
+          <Links />
+          {serverStyleData?.map(({ key, ids, css }) => (
+            <style
+              key={key}
+              data-emotion={`${key} ${ids.join(' ')}`}
+              dangerouslySetInnerHTML={{ __html: css }}
+            />
+          ))}
+        </head>
+        <body>
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </body>
+      </html>
+    );
+  }
+);
+
+const colors = {
+  background: {
+    main: '#111111',
+    800: '#153e75',
+    700: '#2a69ac',
+  },
+  text: {
+    main: '#ffffff',
+    accent: '#af7ffc',
+    700: '#e0e0e0',
+  },
+}
+
+const theme = extendTheme({ colors })
 
 export default function App() {
   return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <div id="sidebar">
-          <h1>Remix Contacts</h1>
-          <div>
-            <Form id="search-form" role="search">
-              <input
-                id="q"
-                aria-label="Search contacts"
-                placeholder="Search"
-                type="search"
-                name="q"
-              />
-              <div id="search-spinner" aria-hidden hidden={true} />
-            </Form>
-            <Form method="post">
-              <button type="submit">New</button>
-            </Form>
-          </div>
-          <nav>
-            <ul>
-              <li>
-                <a href={`/contacts/1`}>Your Name</a>
-              </li>
-              <li>
-                <a href={`/contacts/2`}>Your Friend</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
-  );
+    <Document>
+      <ChakraProvider theme={theme}>
+        <Box bg="background.main" color="text.main" height="100%" width="100%" paddingLeft="10%" paddingRight="10%">
+      <Header />
+        <Outlet />
+        <Footer />
+        </Box>
+      </ChakraProvider>
+    </Document>
+  )
 }
