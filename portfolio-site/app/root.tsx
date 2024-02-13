@@ -87,7 +87,7 @@ const Document = withEmotionCache(
 const colors = {
   background: {
     main: '#111111',
-    800: '#153e75',
+    card: '#222222',
     700: '#2a69ac',
   },
   text: {
@@ -95,6 +95,11 @@ const colors = {
     accent: '#af7ffc',
     700: '#e0e0e0',
   },
+
+  border: {
+    main: '#222222',
+  },
+
 }
 
 const theme = extendTheme({ colors })
@@ -103,7 +108,7 @@ export default function App() {
   return (
     <Document>
       <ChakraProvider theme={theme}>
-        <Box bg="background.main" color="text.main" height="100%" width="100%" paddingLeft="10%" paddingRight="10%">
+        <Box bg="background.main" color="text.main" height="100%" width="100%" paddingX="5%">
       <Header />
         <Outlet />
         <Footer />

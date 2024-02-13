@@ -3,7 +3,7 @@ import snail from "../images/snail-circle.png"
 
 export default function Header() {
     return (
-        <Flex gap="2rem" margin="1rem" padding="1rem" align="center" >
+        <Flex gap="2rem" margin="1rem" padding="1rem" align="center" borderBottom="solid 2px" borderBottomColor="border.main">
             <Image src={snail} alt="snail logo" height="5rem"/>
             {/* <Heading>Header</Heading> */}
             <Spacer />
