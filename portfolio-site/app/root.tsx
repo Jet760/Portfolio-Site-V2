@@ -108,7 +108,7 @@ export default function App() {
   return (
     <Document>
       <ChakraProvider theme={theme}>
-        <Box bg="background.main" color="text.main" height="100%" width="100%" paddingX="5%">
+        <Box bg="background.main" color="text.main" height="100%" width="100%" paddingX="5%" marginY={-5}>
       <Header />
         <Outlet />
         <Footer />
